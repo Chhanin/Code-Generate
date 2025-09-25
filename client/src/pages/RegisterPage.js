@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './RegisterPage.css';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log('Registration attempt with:', { username, email, password });
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await axios.post('/api/auth/register', {
+        username,
+        email,
+        password,
+      });
+
+      if (response.data.success) {
+        setSuccess('Registration successful! Redirecting to login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } 
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.errors) {
+        setError(err.response.data.errors.map(e => e.msg).join(', '));
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    }
   };
 
   return (
@@ -18,6 +43,8 @@ const RegisterPage = () => {
       <div className="auth-card">
         <h2>Create an Account</h2>
         <p>Join us and start generating code!</p>
+        {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">{success}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>

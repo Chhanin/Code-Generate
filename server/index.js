@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const db = require("./database");
 const codeGenerator = require("./codeGenerator");
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 
 // Generate code from prompt
 app.post("/api/generate-code", async (req, res) => {

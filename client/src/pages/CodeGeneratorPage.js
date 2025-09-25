@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Code, Save, Trash2, Copy, Download } from "lucide-react";
 
 function CodeGeneratorPage() {
+  const { logout } = useContext(AuthContext);
   const [prompt, setPrompt] = useState("");
   const [language, setLanguage] = useState("javascript");
   const [generatedCode, setGeneratedCode] = useState("");
@@ -144,17 +146,19 @@ function CodeGeneratorPage() {
 
   return (
     <div className="container">
-      <header className="header">
-        <h1>
-          <Code
-            size={48}
-            style={{ marginRight: "15px", verticalAlign: "middle" }}
-          />
-          Code Generator
-        </h1>
+            <header className="header">
+        <div className="header-content">
+          <h1>
+            <Code
+              size={48}
+              style={{ marginRight: "15px", verticalAlign: "middle" }}
+            />
+            Code Generator
+          </h1>
+          <button onClick={logout} className="btn btn-small btn-danger">Logout</button>
+        </div>
         <p>Transform your ideas into code with AI-powered generation</p>
       </header>
-
       <div className="main-content">
         <div className="card">
           <div className="card-header">

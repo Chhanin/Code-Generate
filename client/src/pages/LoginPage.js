@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt with:', { email, password });
+    setError('');
+
+    try {
+      const response = await axios.post('/api/auth/login', { email, password });
+      if (response.data.token) {
+        login(response.data.token);
+        navigate('/');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.errors) {
+        setError(err.response.data.errors.map(e => e.msg).join(', '));
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    }
   };
+
 
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2>Welcome Back!</h2>
         <p>Please log in to continue</p>
+        {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
