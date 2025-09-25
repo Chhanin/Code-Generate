@@ -3,7 +3,10 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Code, Save, Trash2, Copy, Download } from "lucide-react";
+import { Code } from "lucide-react";
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import GenerateCode from '../components/GenerateCode';
+import SavedCodes from '../components/SavedCodes';
 
 function CodeGeneratorPage() {
   const { logout } = useContext(AuthContext);
@@ -144,9 +147,11 @@ function CodeGeneratorPage() {
     return mapping[lang] || "text";
   };
 
+  const location = useLocation();
+
   return (
     <div className="container">
-            <header className="header">
+      <header className="header">
         <div className="header-content">
           <h1>
             <Code
@@ -159,155 +164,32 @@ function CodeGeneratorPage() {
         </div>
         <p>Transform your ideas into code with AI-powered generation</p>
       </header>
+
+      <nav className="main-nav">
+        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+          Generate
+        </Link>
+        <Link to="/saved" className={`nav-link ${location.pathname === '/saved' ? 'active' : ''}`}>
+          Saved Codes
+        </Link>
+      </nav>
+
       <div className="main-content">
-        <div className="card">
-          <div className="card-header">
-            <h2>Generate Code</h2>
-          </div>
-          <div className="card-content">
-            <form onSubmit={handleGenerateCode}>
-              <div className="form-group">
-                <label htmlFor="prompt">Describe what you want to build:</label>
-                <textarea
-                  id="prompt"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., Create a function that calculates the factorial of a number"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="language">Select Programming Language:</label>
-                <select
-                  id="language"
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  {languages.map((lang) => (
-                    <option key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <button type="submit" className="btn" disabled={isLoading}>
-                {isLoading ? "Generating..." : "Generate Code"}
-              </button>
-            </form>
-
-            {error && <div className="error">{error}</div>}
-            {success && <div className="success">{success}</div>}
-
-            {generatedCode && (
-              <div className="code-output">
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <h3>Generated Code:</h3>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "8px",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <button
-                      onClick={() => handleCopyCode(generatedCode)}
-                      className="btn btn-small"
-                      style={{ flex: "1", minWidth: "120px" }}
-                    >
-                      <Copy size={16} style={{ marginRight: "5px" }} />
-                      Copy
-                    </button>
-                    <button
-                      onClick={() => handleDownloadCode(generatedCode, language)}
-                      className="btn btn-small"
-                      style={{ flex: "1", minWidth: "120px" }}
-                    >
-                      <Download size={16} style={{ marginRight: "5px" }} />
-                      Download
-                    </button>
-                  </div>
-                </div>
-                <SyntaxHighlighter
-                  language={getLanguageForHighlighter(language)}
-                  style={tomorrow}
-                  showLineNumbers
-                >
-                  {generatedCode}
-                </SyntaxHighlighter>
-                <button
-                  onClick={handleSaveCode}
-                  className="btn"
-                  style={{ marginTop: "15px" }}
-                >
-                  <Save size={16} style={{ marginRight: "5px" }} />
-                  Save Code
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="saved-codes">
-          <h2>Saved Codes</h2>
-          <div className="saved-codes-content">
-            {savedCodes.length === 0 ? (
-              <p>No saved codes yet. Generate some code to see them here!</p>
-            ) : (
-              savedCodes.map((item) => (
-                <div key={item.prompt_id} className="saved-item">
-                  <h3>{item.prompt_text}</h3>
-                  <div className="meta">
-                    Language: {item.language} | Created:{" "}
-                    {new Date(item.prompt_created_at).toLocaleString()}
-                  </div>
-                  {item.code && (
-                    <div className="code-preview">
-                      <SyntaxHighlighter
-                        language={getLanguageForHighlighter(item.language)}
-                        style={tomorrow}
-                        showLineNumbers
-                      >
-                        {item.code}
-                      </SyntaxHighlighter>
-                    </div>
-                  )}
-                  <div className="actions">
-                    <button
-                      onClick={() => handleCopyCode(item.code)}
-                      className="btn btn-small"
-                    >
-                      <Copy size={14} style={{ marginRight: "5px" }} />
-                      Copy
-                    </button>
-                    <button
-                      onClick={() => handleDownloadCode(item.code, item.language)}
-                      className="btn btn-small"
-                    >
-                      <Download size={14} style={{ marginRight: "5px" }} />
-                      Download
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCode(item.prompt_id)}
-                      className="btn btn-small btn-danger"
-                    >
-                      <Trash2 size={14} style={{ marginRight: "5px" }} />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        <Outlet context={{
+          prompt, setPrompt,
+          language, setLanguage,
+          languages,
+          handleGenerateCode,
+          isLoading,
+          error, success,
+          generatedCode,
+          handleCopyCode,
+          handleDownloadCode,
+          handleSaveCode,
+          getLanguageForHighlighter,
+          savedCodes,
+          handleDeleteCode
+        }} />
       </div>
     </div>
   );

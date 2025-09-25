@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CodeGeneratorPage from './pages/CodeGeneratorPage';
+import GenerateCode from './components/GenerateCode';
+import SavedCodes from './components/SavedCodes';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 
 const AppRoutes = () => {
@@ -15,7 +17,10 @@ const AppRoutes = () => {
       <Route 
         path="/"
         element={auth.isAuthenticated ? <CodeGeneratorPage /> : <Navigate to="/login" />}
-      />
+      >
+        <Route index element={<GenerateCode />} />
+        <Route path="saved" element={<SavedCodes />} />
+      </Route>
     </Routes>
   );
 };
