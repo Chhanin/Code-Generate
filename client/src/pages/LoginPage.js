@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { AuthContext } from '../context/AuthContext';
 import './LoginPage.css';
 
@@ -16,7 +16,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await api.post('/api/auth/login', { email, password });
       if (response.data.token) {
         login(response.data.token);
         navigate('/');

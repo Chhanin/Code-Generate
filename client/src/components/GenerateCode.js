@@ -15,7 +15,6 @@ const GenerateCode = () => {
     generatedCode, 
     handleCopyCode, 
     handleDownloadCode, 
-    handleSaveCode, 
     getLanguageForHighlighter 
   } = useOutletContext();
   return (
@@ -102,14 +101,6 @@ const GenerateCode = () => {
             >
               {generatedCode}
             </SyntaxHighlighter>
-            <button
-              onClick={handleSaveCode}
-              className="btn"
-              style={{ marginTop: "15px" }}
-            >
-              <Save size={16} style={{ marginRight: "5px" }} />
-              Save Code
-            </button>
           </div>
         )}
       </div>

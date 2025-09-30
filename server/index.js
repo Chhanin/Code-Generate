@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const db = require("./database");
 const codeGenerator = require("./codeGenerator");
+const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 
 const app = express();
@@ -18,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 
 // Generate code from prompt
-app.post("/api/generate-code", async (req, res) => {
+app.post("/api/generate-code", authMiddleware, async (req, res) => {
   try {
     const { text, language } = req.body;
 
@@ -26,11 +27,11 @@ app.post("/api/generate-code", async (req, res) => {
       return res.status(400).json({ error: "Text and language are required" });
     }
 
-    // Save prompt to database
+    // Save prompt to database, associated with the user
     const promptId = await new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO prompts (text, language) VALUES (?, ?)",
-        [text, language],
+        "INSERT INTO prompts (user_id, text, language) VALUES (?, ?, ?)",
+        [req.user.id, text, language],
         function (err) {
           if (err) reject(err);
           else resolve(this.lastID);
@@ -66,7 +67,7 @@ app.post("/api/generate-code", async (req, res) => {
 });
 
 // Get all saved prompts and codes
-app.get("/api/saved-codes", (req, res) => {
+app.get("/api/saved-codes", authMiddleware, (req, res) => {
   const query = `
     SELECT 
       p.id as prompt_id,
@@ -77,10 +78,11 @@ app.get("/api/saved-codes", (req, res) => {
       gc.created_at as code_created_at
     FROM prompts p
     LEFT JOIN generated_code gc ON p.id = gc.prompt_id
+    WHERE p.user_id = ?
     ORDER BY p.created_at DESC
   `;
 
-  db.all(query, [], (err, rows) => {
+  db.all(query, [req.user.id], (err, rows) => {
     if (err) {
       console.error("Error fetching saved codes:", err);
       return res.status(500).json({ error: "Failed to fetch saved codes" });
@@ -90,21 +92,33 @@ app.get("/api/saved-codes", (req, res) => {
 });
 
 // Delete a saved prompt and its code
-app.delete("/api/saved-codes/:id", (req, res) => {
+app.delete("/api/saved-codes/:id", authMiddleware, (req, res) => {
   const { id } = req.params;
 
-  db.run("DELETE FROM generated_code WHERE prompt_id = ?", [id], (err) => {
+  // First, verify that the prompt belongs to the user
+  db.get("SELECT * FROM prompts WHERE id = ? AND user_id = ?", [id, req.user.id], (err, row) => {
     if (err) {
-      console.error("Error deleting generated code:", err);
-      return res.status(500).json({ error: "Failed to delete code" });
+      console.error("Error verifying prompt ownership:", err);
+      return res.status(500).json({ error: "Failed to verify ownership" });
+    }
+    if (!row) {
+      return res.status(403).json({ error: "You do not have permission to delete this code" });
     }
 
-    db.run("DELETE FROM prompts WHERE id = ?", [id], (err) => {
+    // If ownership is verified, proceed with deletion
+    db.run("DELETE FROM generated_code WHERE prompt_id = ?", [id], (err) => {
       if (err) {
-        console.error("Error deleting prompt:", err);
-        return res.status(500).json({ error: "Failed to delete prompt" });
+        console.error("Error deleting generated code:", err);
+        return res.status(500).json({ error: "Failed to delete code" });
       }
-      res.json({ success: true });
+
+      db.run("DELETE FROM prompts WHERE id = ?", [id], (err) => {
+        if (err) {
+          console.error("Error deleting prompt:", err);
+          return res.status(500).json({ error: "Failed to delete prompt" });
+        }
+        res.json({ success: true });
+      });
     });
   });
 });

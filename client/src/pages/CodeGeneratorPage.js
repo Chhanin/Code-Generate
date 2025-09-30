@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
+import api from "../api";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Code } from "lucide-react";
@@ -9,7 +9,7 @@ import GenerateCode from '../components/GenerateCode';
 import SavedCodes from '../components/SavedCodes';
 
 function CodeGeneratorPage() {
-  const { logout } = useContext(AuthContext);
+  const { auth, logout } = useContext(AuthContext);
   const [prompt, setPrompt] = useState("");
   const [language, setLanguage] = useState("javascript");
   const [generatedCode, setGeneratedCode] = useState("");
@@ -28,14 +28,16 @@ function CodeGeneratorPage() {
     { value: "react", label: "React" },
   ];
 
-  // Load saved codes on component mount
+  // Load saved codes only when authentication is confirmed
   useEffect(() => {
-    loadSavedCodes();
-  }, []);
+    if (!auth.loading && auth.isAuthenticated) {
+      loadSavedCodes();
+    }
+  }, [auth.loading, auth.isAuthenticated]);
 
   const loadSavedCodes = async () => {
     try {
-      const response = await axios.get("/api/saved-codes");
+      const response = await api.get("/api/saved-codes");
       setSavedCodes(response.data);
     } catch (error) {
       console.error("Error loading saved codes:", error);
@@ -54,7 +56,7 @@ function CodeGeneratorPage() {
     setSuccess("");
 
     try {
-      const response = await axios.post("/api/generate-code", {
+      const response = await api.post("/api/generate-code", {
         text: prompt,
         language: language,
       });
@@ -72,29 +74,10 @@ function CodeGeneratorPage() {
     }
   };
 
-  const handleSaveCode = async () => {
-    if (!generatedCode) {
-      setError("No code to save");
-      return;
-    }
-
-    try {
-      await axios.post("/api/generate-code", {
-        text: prompt,
-        language: language,
-      });
-
-      setSuccess("Code saved successfully!");
-      loadSavedCodes();
-    } catch (error) {
-      setError("Failed to save code");
-      console.error("Error saving code:", error);
-    }
-  };
 
   const handleDeleteCode = async (promptId) => {
     try {
-      await axios.delete(`/api/saved-codes/${promptId}`);
+      await api.delete(`/api/saved-codes/${promptId}`);
       setSuccess("Code deleted successfully!");
       loadSavedCodes();
     } catch (error) {
@@ -185,7 +168,6 @@ function CodeGeneratorPage() {
           generatedCode,
           handleCopyCode,
           handleDownloadCode,
-          handleSaveCode,
           getLanguageForHighlighter,
           savedCodes,
           handleDeleteCode
