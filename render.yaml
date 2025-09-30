@@ -23,6 +23,12 @@ services:
     plan: free
     rootDir: client
     buildCommand: 'npm install && npm run build'
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: code-generator-server
+          property: url
     staticPublishPath: build
     routes:
       - type: rewrite
