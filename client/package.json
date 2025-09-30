@@ -16,7 +16,7 @@
     "react-syntax-highlighter": "^15.5.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -39,5 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5003"
+  "proxy": "http://localhost:5004"
 }

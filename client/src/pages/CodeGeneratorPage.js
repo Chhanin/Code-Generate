@@ -33,7 +33,7 @@ function CodeGeneratorPage() {
 
   const loadSavedCodes = async () => {
     try {
-      const response = await api.get("/api/saved-codes");
+      const response = await api.get("/saved-codes");
       setSavedCodes(response.data);
     } catch (error) {
       console.error("Error loading saved codes:", error);
@@ -52,7 +52,7 @@ function CodeGeneratorPage() {
     setSuccess("");
 
     try {
-      const response = await api.post("/api/generate-code", {
+      const response = await api.post("/generate-code", {
         text: prompt,
         language: language,
       });
@@ -73,7 +73,7 @@ function CodeGeneratorPage() {
 
   const handleDeleteCode = async (promptId) => {
     try {
-      await api.delete(`/api/saved-codes/${promptId}`);
+      await api.delete(`/saved-codes/${promptId}`);
       setSuccess("Code deleted successfully!");
       loadSavedCodes();
     } catch (error) {

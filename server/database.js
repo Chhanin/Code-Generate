@@ -1,7 +1,8 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
-const dbPath = path.join(__dirname, "code_generator.db");
+// Use DATABASE_PATH from environment variables for production, otherwise use local file
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, "code_generator.db");
 const db = new sqlite3.Database(dbPath);
 
 // Initialize database tables

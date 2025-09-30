@@ -1,5 +1,32 @@
 const OpenAI = require('openai');
 
+// Helper functions
+const camelCase = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase())
+    .replace(/[^a-zA-Z0-9]/g, "");
+};
+
+const snakeCase = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+};
+
+const pascalCase = (str) => {
+  const camel = camelCase(str);
+  return camel.charAt(0).toUpperCase() + camel.slice(1);
+};
+
+const kebabCase = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+};
+
 // OpenAI API configuration
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -200,6 +227,7 @@ const isCodeLine = (line, language) => {
   return pattern ? pattern.test(line) : true;
 };
 
+
 const generateEnhancedTemplateCode = (text, language) => {
   const templates = {
     javascript: generateEnhancedJavaScriptCode,
@@ -216,7 +244,12 @@ const generateEnhancedTemplateCode = (text, language) => {
     throw new Error(`Unsupported language: ${language}`);
   }
 
-  return generator(text);
+  if (generator) {
+    return generator(text);
+  }
+
+  // Generic fallback for any unsupported language
+  return `// Template for ${language} - ${text}\n// TODO: Implement logic here`;
 };
 
 const generateTemplateCode = (text, language) => {
@@ -2389,33 +2422,11 @@ ${componentName}.propTypes = {
 export default ${componentName};`;
 };
 
-// Helper functions
-const camelCase = (str) => {
-  return str
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase())
-    .replace(/[^a-zA-Z0-9]/g, "");
-};
-
-const snakeCase = (str) => {
-  return str
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-};
-
-const pascalCase = (str) => {
-  const camel = camelCase(str);
-  return camel.charAt(0).toUpperCase() + camel.slice(1);
-};
-
-const kebabCase = (str) => {
-  return str
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-};
 
 module.exports = {
   generateCode,
+  camelCase,
+  snakeCase,
+  pascalCase,
+  kebabCase,
 };
