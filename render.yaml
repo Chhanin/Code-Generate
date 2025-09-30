@@ -4,6 +4,7 @@ services:
     name: code-generator-server
     runtime: node
     plan: free
+    rootDir: server
     buildCommand: 'npm install'
     startCommand: 'npm start'
     envVars:
@@ -20,8 +21,9 @@ services:
   - type: static
     name: code-generator-client
     plan: free
-    buildCommand: 'npm run build'
-    staticPublishPath: client/build
+    rootDir: client
+    buildCommand: 'npm install && npm run build'
+    staticPublishPath: build
     routes:
       - type: rewrite
         source: /*
