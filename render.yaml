@@ -16,6 +16,10 @@ services:
       - name: data
         mountPath: /var/data
         sizeGB: 1
+    routes:
+      - type: redirect
+        source: /
+        destination: https://code-generator-client.onrender.com
 
   # Frontend Service (React Static Site)
   - type: static
