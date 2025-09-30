@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Code } from "lucide-react";
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import GenerateCode from '../components/GenerateCode';
-import SavedCodes from '../components/SavedCodes';
 
 function CodeGeneratorPage() {
   const { auth, logout } = useContext(AuthContext);

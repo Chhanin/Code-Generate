@@ -2,7 +2,7 @@ import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Download, Save } from 'lucide-react';
+import { Copy, Download } from 'lucide-react';
 
 const GenerateCode = () => {
   const { 
