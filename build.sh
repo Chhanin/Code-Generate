@@ -3,13 +3,9 @@ set -e
 
 echo "Installing client dependencies..."
 cd client
-npm ci
+npm install
 
 echo "Building React app..."
 npm run build
 
-echo "Moving build to root..."
-cd ..
-mv client/build ./build
-
-echo "Build complete!"
+echo "Build complete! Build directory is at client/build"

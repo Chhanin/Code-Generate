@@ -5,8 +5,8 @@ services:
     runtime: node
     plan: free
     rootDir: server
-    buildCommand: 'npm install'
-    startCommand: 'npm start'
+    buildCommand: "npm install"
+    startCommand: "npm start"
     envVars:
       - key: DATABASE_PATH
         value: /var/data/code_generator.db
@@ -25,8 +25,8 @@ services:
   - type: static
     name: code-generator-client
     plan: free
-    buildCommand: 'bash build.sh'
-    staticPublishPath: build
+    buildCommand: "bash build.sh"
+    staticPublishPath: client/build
     envVars:
       - key: REACT_APP_API_URL
         fromService:

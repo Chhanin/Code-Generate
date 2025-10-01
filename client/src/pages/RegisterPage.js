@@ -1,39 +1,39 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../api';
-import './RegisterPage.css';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../api";
+import "./RegisterPage.css";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await api.post('/api/auth/register', {
+      const response = await api.post("/auth/register", {
         username,
         email,
         password,
       });
 
       if (response.data.success) {
-        setSuccess('Registration successful! Redirecting to login...');
+        setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => {
-          navigate('/login');
+          navigate("/login");
         }, 2000);
-      } 
+      }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.errors) {
-        setError(err.response.data.errors.map(e => e.msg).join(', '));
+        setError(err.response.data.errors.map((e) => e.msg).join(", "));
       } else {
-        setError('Registration failed. Please try again.');
+        setError("Registration failed. Please try again.");
       }
     }
   };
@@ -76,10 +76,14 @@ const RegisterPage = () => {
               required
             />
           </div>
-          <button type="submit" className="btn-auth">Register</button>
+          <button type="submit" className="btn-auth">
+            Register
+          </button>
         </form>
         <div className="auth-switch">
-          <p>Already have an account? <Link to="/login">Login</Link></p>
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
         </div>
       </div>
     </div>
