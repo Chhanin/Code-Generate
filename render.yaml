@@ -25,8 +25,9 @@ services:
   - type: static
     name: code-generator-client
     plan: free
-    buildCommand: 'cd client && npm install && npm run build'
-    publishPath: client/build
+    rootDir: client
+    buildCommand: 'npm install && npm run build'
+    staticPublishPath: ./build
     envVars:
       - key: REACT_APP_API_URL
         fromService:
