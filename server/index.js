@@ -18,6 +18,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 
+// Root route - helpful message when visiting backend URL directly
+app.get('/', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Code Generator backend is running',
+    usefulRoutes: [
+      '/api/health',
+      '/api/auth/register',
+      '/api/auth/login'
+    ]
+  });
+});
+
 // Generate code from prompt
 app.post("/api/generate-code", authMiddleware, async (req, res) => {
   try {
