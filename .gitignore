@@ -69,7 +69,10 @@ dist
 
 # Gatsby files
 .cache/
+# Ignore top-level public folders by default,
+# but keep the CRA entry file tracked for the client build on Render
 public
+!client/public/index.html
 
 # Storybook build outputs
 .out
